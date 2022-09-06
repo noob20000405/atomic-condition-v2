@@ -174,6 +174,133 @@ double fpUtil::rand01()
 double fpUtil::revisedCondition(uint64_t opcode, double lhs, double rhs) {
     char com[256];
     char buf[256];
+    
+    strcpy(com, "./cond ");
+    snprintf(buf, 50, "%lf", lhs);
+    strcat(com, buf);
+    strcat(com, " ");
+    snprintf(buf, 50, "%lf", rhs);
+    strcat(com, buf);
+    strcat(com, " ");
+    
+    switch(opcode) {
+        case OP_ADD: {
+            strcat(com, "1");
+            printf("commande : %s\n", com);
+            system(com);
+            FILE * f = fopen("pipe.txt", "r");
+            fgets(buf, 256, f);
+            fclose(f);
+            return strtod(buf, NULL);
+            }
+        case OP_SUB: {
+            strcat(com, "2");
+            printf("commande : %s\n", com);
+            system(com);
+            FILE * f = fopen("pipe.txt", "r");
+            fgets(buf, 256, f);
+            fclose(f);
+            return strtod(buf, NULL);
+        }
+        case OP_SIN: {
+            strcat(com, "3");
+            printf("commande : %s\n", com);
+            system(com);
+            FILE * f = fopen("pipe.txt", "r");
+            fgets(buf, 256, f);
+            fclose(f);
+            return strtod(buf, NULL);
+        }
+        case OP_COS: {
+            strcat(com, "4");
+            printf("commande : %s\n", com);
+            system(com);
+            FILE * f = fopen("pipe.txt", "r");
+            fgets(buf, 256, f);
+            fclose(f);
+            return strtod(buf, NULL);
+        }
+        case OP_TAN: {
+            strcat(com, "5");
+            printf("commande : %s\n", com);
+            system(com);
+            FILE * f = fopen("pipe.txt", "r");
+            fgets(buf, 256, f);
+            fclose(f);
+            return strtod(buf, NULL);
+        }
+        case OP_ASIN: {
+            strcat(com, "6");
+            printf("commande : %s\n", com);
+            system(com);
+            FILE * f = fopen("pipe.txt", "r");
+            fgets(buf, 256, f);
+            fclose(f);
+            return strtod(buf, NULL);
+        }
+        case OP_ACOS: {
+            strcat(com, "7");
+            printf("commande : %s\n", com);
+            system(com);
+            FILE * f = fopen("pipe.txt", "r");
+            fgets(buf, 256, f);
+            fclose(f);
+            return strtod(buf, NULL);
+        }
+        case OP_SINH: {
+            strcat(com, "8");
+            printf("commande : %s\n", com);
+            system(com);
+            FILE * f = fopen("pipe.txt", "r");
+            fgets(buf, 256, f);
+            fclose(f);
+            return strtod(buf, NULL);
+        }
+        case OP_COSH: {
+            strcat(com, "9");
+            printf("commande : %s\n", com);
+            system(com);
+            FILE * f = fopen("pipe.txt", "r");
+            fgets(buf, 256, f);
+            fclose(f);
+            return strtod(buf, NULL);
+        }
+        case OP_LOG: {
+            strcat(com, "10");
+            printf("commande : %s\n", com);
+            system(com);
+            FILE * f = fopen("pipe.txt", "r");
+            fgets(buf, 256, f);
+            fclose(f);
+            return strtod(buf, NULL);
+        }
+        case OP_LOG10: {
+            strcat(com, "11");
+            printf("commande : %s\n", com);
+            system(com);
+            FILE * f = fopen("pipe.txt", "r");
+            fgets(buf, 256, f);
+            fclose(f);
+            return strtod(buf, NULL);
+        }
+        case OP_POW: {
+            strcat(com, "12");
+            printf("commande : %s\n", com);
+            system(com);
+            FILE * f = fopen("pipe.txt", "r");
+            fgets(buf, 256, f);
+            fclose(f);
+            return strtod(buf, NULL);
+        }
+        default:
+            return -DBL_MAX;
+    }
+    return -DBL_MAX;
+}
+
+double fpUtil::rawCondition(uint64_t opcode, double lhs, double rhs) {
+    char com[256];
+    char buf[256];
     double cond1, cond2;
     double dzdist;
     
@@ -184,80 +311,25 @@ double fpUtil::revisedCondition(uint64_t opcode, double lhs, double rhs) {
     snprintf(buf, 50, "%lf", rhs);
     strcat(com, buf);
     strcat(com, " ");
-    
-    printf("commande : %s\n", com);
-    
     switch(opcode) {
         case OP_ADD: {
             strcat(com, "1");
+            printf("commande : %s\n", com);
             system(com);
             FILE * f = fopen("pipe.txt", "r");
             fgets(buf, 256, f);
+            fclose(f);
             return strtod(buf, NULL);
             }
-        case OP_SUB:
-            dzdist = fabs(lhs-rhs);
-            cond1 = fabs(lhs) / dzdist;
-            cond2 = fabs(rhs) / dzdist;
-            return cond1 + cond2 - dzdist;
-        case OP_SIN:
-            // cond1 = fabs(lhs / tan(lhs));
-            // x \to n*pi, n \in Z.
-            cond1 = 1 / fabs(remainder(lhs, fpUtil::PI));
-            return cond1;
-        case OP_COS:
-            // cond1 = fabs(lhs * tan(lhs));
-            // x \to n*pi + pi/2, n \in Z.
-            cond1 = 1 / fabs(remainder((remainder(lhs, fpUtil::PI)-fpUtil::PI_2),fpUtil::PI));
-            return cond1;
-        case OP_TAN:
-            // cond1 = fabs(lhs / (sin(lhs) * cos(lhs)));
-            // x \to n*pi/2, n \in Z.
-            cond1 = 1 / fabs(remainder(lhs, fpUtil::PI_2));
-            return cond1;
-        case OP_ASIN:
-            cond1 = fabs(lhs / (sqrt(1-lhs*lhs) * asin(lhs)));
-            return cond1;
-        case OP_ACOS:
-            cond1 = fabs(lhs / (sqrt(1-lhs*lhs) * acos(lhs)));
-            return cond1;
-        case OP_SINH:
-            cond1 = fabs(lhs / tanh(lhs));
-            return cond1;
-        case OP_COSH:
-            cond1 = fabs(lhs * tanh(lhs));
-            return cond1;
-        case OP_LOG:
-            dzdist = fabs(lhs - 1);
-            cond1 = fabs(1 / log(lhs));
-            return cond1 - dzdist;
-        case OP_LOG10:
-            dzdist = fabs(lhs - 1);
-            cond1 = fabs(1 / log(lhs));
-            return cond1 - dzdist;
-        case OP_POW:
-            cond1 = fabs(rhs);
-            cond2 = fabs(rhs * log(lhs));
-            return cond1 + cond2;
-        default:
-            return -DBL_MAX;
-    }
-    return -DBL_MAX;
-}
-
-double fpUtil::rawCondition(uint64_t opcode, double lhs, double rhs) {
-    double cond1, cond2, dzdist;
-    switch(opcode) {
-        case OP_ADD:
-            dzdist = fabs(lhs+rhs);
-            cond1 = fabs(lhs) / dzdist;
-            cond2 = fabs(rhs) / dzdist;
-            return cond1 + cond2;
-        case OP_SUB:
-            dzdist = fabs(lhs-rhs);
-            cond1 = fabs(lhs) / dzdist;
-            cond2 = fabs(rhs) / dzdist;
-            return cond1 + cond2;
+        case OP_SUB: {
+            strcat(com, "2");
+            printf("commande : %s\n", com);
+            system(com);
+            FILE * f = fopen("pipe.txt", "r");
+            fgets(buf, 256, f);
+            fclose(f);
+            return strtod(buf, NULL);
+        }
         case OP_SIN:
             cond1 = fabs(lhs / tan(lhs));
             return cond1;
@@ -267,30 +339,69 @@ double fpUtil::rawCondition(uint64_t opcode, double lhs, double rhs) {
         case OP_TAN:
             cond1 = fabs(lhs / (sin(lhs) * cos(lhs)));
             return cond1;
-        case OP_ASIN:
-            cond1 = fabs(lhs / (sqrt(1-lhs*lhs) * asin(lhs)));
-            return cond1;
-        case OP_ACOS:
-            cond1 = fabs(lhs / (sqrt(1-lhs*lhs) * acos(lhs)));
-            return cond1;
-        case OP_SINH:
-            cond1 = fabs(lhs / tanh(lhs));
-            return cond1;
-        case OP_COSH:
-            cond1 = fabs(lhs * tanh(lhs));
-            return cond1;
-        case OP_LOG:
-            dzdist = fabs(lhs - 1);
-            cond1 = fabs(1 / log(lhs));
-            return cond1;
-        case OP_LOG10:
-            dzdist = fabs(lhs - 1);
-            cond1 = fabs(1 / log(lhs));
-            return cond1;
-        case OP_POW:
-            cond1 = fabs(rhs);
-            cond2 = fabs(rhs * log(lhs));
-            return cond1 + cond2;
+        case OP_ASIN: {
+            strcat(com, "6");
+            printf("commande : %s\n", com);
+            system(com);
+            FILE * f = fopen("pipe.txt", "r");
+            fgets(buf, 256, f);
+            fclose(f);
+            return strtod(buf, NULL);
+        }
+        case OP_ACOS: {
+            strcat(com, "7");
+            printf("commande : %s\n", com);
+            system(com);
+            FILE * f = fopen("pipe.txt", "r");
+            fgets(buf, 256, f);
+            fclose(f);
+            return strtod(buf, NULL);
+        }
+        case OP_SINH: {
+            strcat(com, "8");
+            printf("commande : %s\n", com);
+            system(com);
+            FILE * f = fopen("pipe.txt", "r");
+            fgets(buf, 256, f);
+            fclose(f);
+            return strtod(buf, NULL);
+        }
+        case OP_COSH: {
+            strcat(com, "9");
+            printf("commande : %s\n", com);
+            system(com);
+            FILE * f = fopen("pipe.txt", "r");
+            fgets(buf, 256, f);
+            fclose(f);
+            return strtod(buf, NULL);
+        }
+        case OP_LOG: {
+            strcat(com, "10");
+            printf("commande : %s\n", com);
+            system(com);
+            FILE * f = fopen("pipe.txt", "r");
+            fgets(buf, 256, f);
+            fclose(f);
+            return strtod(buf, NULL);
+        }
+        case OP_LOG10: {
+            strcat(com, "11");
+            printf("commande : %s\n", com);
+            system(com);
+            FILE * f = fopen("pipe.txt", "r");
+            fgets(buf, 256, f);
+            fclose(f);
+            return strtod(buf, NULL);
+        }
+        case OP_POW: {
+            strcat(com, "12");
+            printf("commande : %s\n", com);
+            system(com);
+            FILE * f = fopen("pipe.txt", "r");
+            fgets(buf, 256, f);
+            fclose(f);
+            return strtod(buf, NULL);
+        }
         default:
             return 1;
     }
