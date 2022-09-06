@@ -193,7 +193,7 @@ double fpUtil::revisedCondition(uint64_t opcode, double lhs, double rhs) {
             system(com);
             FILE * f = fopen("pipe.txt", "r");
             fgets(buf, 256, f);
-            return strtod(buf);
+            return strtod(buf, NULL);
         case OP_SUB:
             dzdist = fabs(lhs-rhs);
             cond1 = fabs(lhs) / dzdist;
