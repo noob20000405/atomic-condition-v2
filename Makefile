@@ -1,10 +1,10 @@
 CXX=clang++-3.9
 LD=clang++-3.9
-CXXFLAGS=-std=c++11 -O2 -fPIC -fno-rtti
+CXXFLAGS=-std=c++11 -O2 -fPIC -fno-rtti -lm -lcadnaC
 
 CLANG=clang-3.9
 OPT=opt-3.9
-CLANGFLAGS=-fPIC -fno-rtti
+CLANGFLAGS=-fPIC -fno-rtti -lm -lcadnaC
 
 LLVMCFG=llvm-config-3.9
 LLVMCXXFLAGS=$(shell $(LLVMCFG) --cxxflags)
@@ -38,7 +38,7 @@ build/handlers.o: src/handlers.cpp $(DEPS)
 util: build/fpUtil.o
 build/fpUtil.o: src/fpUtil.cpp src/fpUtil.h
 	@mkdir -p build
-	$(CXX) $(CXXFLAGS) -c -o $@ $< -lcadnaC -lm
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 # Compile the target under analysis start.
 targetObjs = build/targetExample.o
@@ -59,7 +59,7 @@ bin/gslSolver.out: build/gslSolver.o build/fpUtil.o build/handlers.o build/all_t
 	$(LD) -o $@ $^ $(GSLLDFLAGS)
 build/gslSolver.o: src/gslSolver.cpp $(DEPS)
 	@mkdir -p build
-	$(CXX) $(GSLCXXFLAGS) -c -o $@ $< -lcadnaC
+	$(CXX) $(GSLCXXFLAGS) -c -o $@ $<
 
 clean:
 	rm -f *.o *.so *.out
