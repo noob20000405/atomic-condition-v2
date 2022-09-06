@@ -304,7 +304,7 @@ double fpUtil::rawCondition(uint64_t opcode, double lhs, double rhs) {
     double cond1, cond2;
     double dzdist;
     
-    strcpy(com, "./cond ");
+    strcpy(com, "./src/cond ");
     snprintf(buf, 50, "%lf", lhs);
     strcat(com, buf);
     strcat(com, " ");
