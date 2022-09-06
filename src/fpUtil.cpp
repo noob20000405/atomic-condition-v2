@@ -1,5 +1,5 @@
 #include "fpUtil.h"
-#include <cadna.h>
+#include <string.h>
 
 double fpUtil::i64ToDouble(uint64_t i) {
     return *(double*)(&i);
@@ -170,97 +170,126 @@ double fpUtil::rand01()
     return fabs(fpUtil::randDouble()/fpUtil::DBL_POSINF);
 }
 
-double fpUtil::revisedCondition(uint64_t opcode, double lhs_d, double rhs_d) {
-    cadna_init(-1);
-    double_st lhs = lhs_d;
-    double_st rhs = rhs_d;
+
+double fpUtil::revisedCondition(uint64_t opcode, double lhs, double rhs) {
+    char com[256];
+    char buf[256];
+    double cond1, cond2;
+    double dzdist;
+    
+    strcpy(com, "./cond ");
+    snprintf(buf, 50, "%lf", lhs);
+    strcat(com, buf);
+    strcat(com, " ");
+    snprintf(buf, 50, "%lf", rhs);
+    strcat(com, buf);
+    strcat(com, " ");
+    
+    printf("commande : %s\n", com);
+    
     switch(opcode) {
         case OP_ADD:
-            lhs += rhs;
-            return (pow(10, -(lhs.getaccuracy())) * pow(2, 53));
+            strcat(com, "1");
+            system(com);
+            FILE * f = fopen("pipe.txt", "r");
+            fgets(buf, 256, f);
+            return strtod(buf);
         case OP_SUB:
-            lhs -= rhs;
-            return (pow(10, -(lhs.getaccuracy())) * pow(2, 53));
+            dzdist = fabs(lhs-rhs);
+            cond1 = fabs(lhs) / dzdist;
+            cond2 = fabs(rhs) / dzdist;
+            return cond1 + cond2 - dzdist;
         case OP_SIN:
             // cond1 = fabs(lhs / tan(lhs));
             // x \to n*pi, n \in Z.
-            lhs = sin(lhs);
-            return (pow(10, -(lhs.getaccuracy())) * pow(2, 53));
+            cond1 = 1 / fabs(remainder(lhs, fpUtil::PI));
+            return cond1;
         case OP_COS:
             // cond1 = fabs(lhs * tan(lhs));
             // x \to n*pi + pi/2, n \in Z.
-            lhs = cos(lhs);
-            return (pow(10, -(lhs.getaccuracy())) * pow(2, 53));
+            cond1 = 1 / fabs(remainder((remainder(lhs, fpUtil::PI)-fpUtil::PI_2),fpUtil::PI));
+            return cond1;
         case OP_TAN:
             // cond1 = fabs(lhs / (sin(lhs) * cos(lhs)));
             // x \to n*pi/2, n \in Z.
-            lhs = tan(lhs);
-            return (pow(10, -(lhs.getaccuracy())) * pow(2, 53));
+            cond1 = 1 / fabs(remainder(lhs, fpUtil::PI_2));
+            return cond1;
         case OP_ASIN:
-            lhs = asin(lhs);
-            return (pow(10, -(lhs.getaccuracy())) * pow(2, 53));
+            cond1 = fabs(lhs / (sqrt(1-lhs*lhs) * asin(lhs)));
+            return cond1;
         case OP_ACOS:
-            lhs = acos(lhs);
-            return (pow(10, -(lhs.getaccuracy())) * pow(2, 53));
+            cond1 = fabs(lhs / (sqrt(1-lhs*lhs) * acos(lhs)));
+            return cond1;
         case OP_SINH:
-            lhs = sinh(lhs);
-            return (pow(10, -(lhs.getaccuracy())) * pow(2, 53));
+            cond1 = fabs(lhs / tanh(lhs));
+            return cond1;
         case OP_COSH:
-            lhs = cosh(lhs);
-            return (pow(10, -(lhs.getaccuracy())) * pow(2, 53));
+            cond1 = fabs(lhs * tanh(lhs));
+            return cond1;
         case OP_LOG:
-            lhs = log(lhs);
-            return (pow(10, -(lhs.getaccuracy())) * pow(2, 53));
+            dzdist = fabs(lhs - 1);
+            cond1 = fabs(1 / log(lhs));
+            return cond1 - dzdist;
         case OP_LOG10:
-            lhs = log10(lhs);
+            dzdist = fabs(lhs - 1);
+            cond1 = fabs(1 / log(lhs));
+            return cond1 - dzdist;
         case OP_POW:
-            lhs = pow(lhs, rhs);
+            cond1 = fabs(rhs);
+            cond2 = fabs(rhs * log(lhs));
+            return cond1 + cond2;
         default:
             return -DBL_MAX;
     }
     return -DBL_MAX;
 }
 
-double fpUtil::rawCondition(uint64_t opcode, double lhs_d, double rhs_d) {
-    cadna_init(-1);
+double fpUtil::rawCondition(uint64_t opcode, double lhs, double rhs) {
     double cond1, cond2, dzdist;
-    double_st lhs = lhs_d;
-    double_st rhs = rhs_d;
     switch(opcode) {
         case OP_ADD:
-            lhs += rhs;
-            return (pow(10, -(lhs.getaccuracy())) * pow(2, 53));
+            dzdist = fabs(lhs+rhs);
+            cond1 = fabs(lhs) / dzdist;
+            cond2 = fabs(rhs) / dzdist;
+            return cond1 + cond2;
         case OP_SUB:
-            lhs -= rhs;
-            return (pow(10, -(lhs.getaccuracy())) * pow(2, 53));
-        case OP_SIN://
+            dzdist = fabs(lhs-rhs);
+            cond1 = fabs(lhs) / dzdist;
+            cond2 = fabs(rhs) / dzdist;
+            return cond1 + cond2;
+        case OP_SIN:
             cond1 = fabs(lhs / tan(lhs));
             return cond1;
-        case OP_COS://
+        case OP_COS:
             cond1 = fabs(lhs * tan(lhs));
             return cond1;
-        case OP_TAN://
+        case OP_TAN:
             cond1 = fabs(lhs / (sin(lhs) * cos(lhs)));
             return cond1;
         case OP_ASIN:
-            lhs = asin(lhs);
-            return (pow(10, -(lhs.getaccuracy())) * pow(2, 53));
+            cond1 = fabs(lhs / (sqrt(1-lhs*lhs) * asin(lhs)));
+            return cond1;
         case OP_ACOS:
-            lhs = acos(lhs);
-            return (pow(10, -(lhs.getaccuracy())) * pow(2, 53));
+            cond1 = fabs(lhs / (sqrt(1-lhs*lhs) * acos(lhs)));
+            return cond1;
         case OP_SINH:
-            lhs = sinh(lhs);
-            return (pow(10, -(lhs.getaccuracy())) * pow(2, 53));
+            cond1 = fabs(lhs / tanh(lhs));
+            return cond1;
         case OP_COSH:
-            lhs = cosh(lhs);
-            return (pow(10, -(lhs.getaccuracy())) * pow(2, 53));
+            cond1 = fabs(lhs * tanh(lhs));
+            return cond1;
         case OP_LOG:
-            lhs = log(lhs);
-            return (pow(10, -(lhs.getaccuracy())) * pow(2, 53));
+            dzdist = fabs(lhs - 1);
+            cond1 = fabs(1 / log(lhs));
+            return cond1;
         case OP_LOG10:
-            lhs = log10(lhs);
+            dzdist = fabs(lhs - 1);
+            cond1 = fabs(1 / log(lhs));
+            return cond1;
         case OP_POW:
-            lhs = pow(lhs, rhs);
+            cond1 = fabs(rhs);
+            cond2 = fabs(rhs * log(lhs));
+            return cond1 + cond2;
         default:
             return 1;
     }

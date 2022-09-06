@@ -16,15 +16,11 @@ RUN apt-get install -y --no-install-recommends \
 RUN pip3 install wheel
 RUN pip3 install mpmath
 
-RUN git clone https://github.com/noob20000405/atomic-condition-v2.git atom && \
+RUN git clone https://github.com/FP-Analysis/atomic-condition.git atom && \
   cd atom
 
 # Build necessary objects.
 WORKDIR /atom
-RUN cd cadna_c-3.1.11 && ./configure CXX=g++
-RUN cd cadna_c-3.1.11 && make
-RUN cd cadna_c-3.1.11 && make install
-
 RUN make prep
 RUN tar xf gsl-2.5.tar.gz
 
@@ -38,4 +34,3 @@ RUN ./compile-gsl-sf.sh
 
 # Ready for building solver.
 WORKDIR /atom
-

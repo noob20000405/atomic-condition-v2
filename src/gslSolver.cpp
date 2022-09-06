@@ -16,7 +16,6 @@
 #include <functional>
 #include <chrono>
 #include <memory>
-#include <cadna.h>
 
 #include "fpUtil.h"
 #include "fpInterface.h"
@@ -262,7 +261,6 @@ private:
                 }
 
                 double fit = fpUtil::revisedCondition(info.opcode, info.op1, info.op2);
-                cadna_end();
 
                 InstructionInfo &curInst = instMap[info.instID];
                 curInst.pushInputFitness(x, fit);
@@ -328,7 +326,6 @@ private:
                         if (info.instID != curInst.getInstID())
                             continue;
                         double newFit = fpUtil::revisedCondition(info.opcode, info.op1, info.op2);
-                        cadna_end();
                         if (!std::isfinite(newFit))
                             continue;
                         inputList.push_back(InputFitnessPair(newInput, newFit));
@@ -379,14 +376,12 @@ private:
                 // Considering a inst maybe executed multiple times.
                 if (started == false && info.instID == instid) {
                     double tmpFit = fpUtil::revisedCondition(info.opcode, info.op1, info.op2);
-                    cadna_end();
                     if (tmpFit == curFit) {
                         started = true;
                     }
                 }
                 if (started == true) {
                     double rawCond = fpUtil::rawCondition(info.opcode, info.op1, info.op2);
-                    cadna_end();
                     // std::cout << "Raw Cond: " << rawCond;
                     // std::cout << ' ' << info.op1 << ' ' << info.op2 << ' ' << info.opcode << "\n";
                     // Condition

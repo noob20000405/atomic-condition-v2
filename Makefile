@@ -1,10 +1,10 @@
 CXX=clang++-3.9
 LD=clang++-3.9
-CXXFLAGS=-std=c++11 -O2 -fPIC -fno-rtti -lm -lcadnaC
+CXXFLAGS=-std=c++11 -O2 -fPIC -fno-rtti
 
 CLANG=clang-3.9
 OPT=opt-3.9
-CLANGFLAGS=-fPIC -fno-rtti -lm -lcadnaC
+CLANGFLAGS=-fPIC -fno-rtti
 
 LLVMCFG=llvm-config-3.9
 LLVMCXXFLAGS=$(shell $(LLVMCFG) --cxxflags)
