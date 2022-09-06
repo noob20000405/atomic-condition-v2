@@ -21,6 +21,12 @@ RUN git clone https://github.com/noob20000405/atomic-condition-v2.git atom && \
 
 # Build necessary objects.
 WORKDIR /atom
+RUN cd cadna_c-3.1.11
+RUN ./configure CXX=g++
+RUN make
+RUN make install
+RUN cd ../
+
 RUN make prep
 RUN tar xf gsl-2.5.tar.gz
 
