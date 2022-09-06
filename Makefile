@@ -38,7 +38,7 @@ build/handlers.o: src/handlers.cpp $(DEPS)
 util: build/fpUtil.o
 build/fpUtil.o: src/fpUtil.cpp src/fpUtil.h
 	@mkdir -p build
-	$(CXX) $(CXXFLAGS) -c -o $@ $< -cadnaC
+	$(CXX) $(CXXFLAGS) -c -o $@ $< -lcadnaC -lm
 
 # Compile the target under analysis start.
 targetObjs = build/targetExample.o
@@ -59,7 +59,7 @@ bin/gslSolver.out: build/gslSolver.o build/fpUtil.o build/handlers.o build/all_t
 	$(LD) -o $@ $^ $(GSLLDFLAGS)
 build/gslSolver.o: src/gslSolver.cpp $(DEPS)
 	@mkdir -p build
-	$(CXX) $(GSLCXXFLAGS) -c -o $@ $< -cadnaC
+	$(CXX) $(GSLCXXFLAGS) -c -o $@ $< -lcadnaC
 
 clean:
 	rm -f *.o *.so *.out
