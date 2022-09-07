@@ -175,7 +175,7 @@ double fpUtil::revisedCondition(uint64_t opcode, double lhs, double rhs) {
     char com[256];
     char buf[256];
     
-    strcpy(com, "./cond ");
+    strcpy(com, "./src/cond ");
     snprintf(buf, 50, "%lf", lhs);
     strcat(com, buf);
     strcat(com, " ");
